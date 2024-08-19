@@ -99,30 +99,50 @@ class AuthController extends Controller
 
     public function changePassword(Request $request)
     {
-        \Log::info('ChangePassword endpoint hit'); 
+        \Log::info('ChangePassword endpoint hit');
 
-        $validated = $request->validate([
-            'current_password' => 'required|string',
-            'new_password' => 'required|string|min:8|confirmed',
-        ]);
+        try {
+            $validated = $request->validate([
+                'current_password' => 'required|string',
+                'new_password' => 'required|string|min:8|confirmed',
+            ]);
 
-        \Log::info('Validation passed'); 
+            \Log::info('Validation passed', ['user_id' => Auth::id()]);
 
-        $user = Auth::user();
+            $user = Auth::user();
 
-        if (!Hash::check($validated['current_password'], $user->password)) {
-            \Log::info('Current password is incorrect'); 
+            if (!Hash::check($validated['current_password'], $user->password)) {
+                \Log::warning('Current password is incorrect', ['user_id' => $user->id]);
+                return response()->json([
+                    'message' => 'Current password is incorrect'
+                ], 400);
+            }
+
+            $user->password = Hash::make($validated['new_password']);
+            $user->save();
+
+            \Log::info('Password successfully updated', ['user_id' => $user->id]);
+
             return response()->json([
-                'message' => 'Current password is incorrect'
-            ], 400);
+                'message' => 'Password successfully updated'
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed', [
+                'errors' => $e->errors(),
+                'user_id' => Auth::id()
+            ]);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('An error occurred while changing password', [
+                'error_message' => $e->getMessage(),
+                'user_id' => Auth::id()
+            ]);
+            return response()->json([
+                'message' => 'An error occurred while changing the password'
+            ], 500);
         }
-
-        $user->update(['password' => Hash::make($validated['new_password'])]);
-
-        \Log::info('Password successfully updated'); 
-
-        return response()->json([
-            'message' => 'Password successfully updated'
-        ], 200);
     }
 }

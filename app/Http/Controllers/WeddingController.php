@@ -20,30 +20,44 @@ class WeddingController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'groom_name' => 'required|string|max:255',
-            'groom_father_name' => 'required|string|max:255',
-            'groom_mother_name' => 'required|string|max:255',
-            'bride_name' => 'required|string|max:255',
-            'bride_father_name' => 'required|string|max:255',
-            'bride_mother_name' => 'required|string|max:255',
-            'ceremony_time' => 'required|date',
-            'ceremony_location' => 'required|string|max:255',
-            'ceremony_coordinates.latitude' => 'required|numeric',
-            'ceremony_coordinates.longitude' => 'required|numeric',
-            'reception_time' => 'required|date',
-            'reception_location' => 'required|string|max:255',
-            'reception_coordinates.latitude' => 'required|numeric',
-            'reception_coordinates.longitude' => 'required|numeric',
-        ]);
+        try {
+            $validated = $request->validate([
+                'groom_name' => 'required|string|max:255',
+                'groom_father_name' => 'required|string|max:255',
+                'groom_mother_name' => 'required|string|max:255',
+                'bride_name' => 'required|string|max:255',
+                'bride_father_name' => 'required|string|max:255',
+                'bride_mother_name' => 'required|string|max:255',
+                'ceremony_time' => 'required|date',
+                'ceremony_location' => 'required|string|max:255',
+                'ceremony_coordinates.latitude' => 'required|numeric',
+                'ceremony_coordinates.longitude' => 'required|numeric',
+                'reception_time' => 'required|date',
+                'reception_location' => 'required|string|max:255',
+                'reception_coordinates.latitude' => 'required|numeric',
+                'reception_coordinates.longitude' => 'required|numeric',
+            ]);
 
-        $wedding = Auth::user()->weddings()->create($validated);
+            $validated['ceremony_coordinates'] = json_encode($request->input('ceremony_coordinates'));
+            $validated['reception_coordinates'] = json_encode($request->input('reception_coordinates'));
 
-        return response()->json([
-            'message' => 'Wedding created successfully',
-            'data' => $wedding
-        ], 201);
+            $wedding = Auth::user()->weddings()->create($validated);
+
+            return response()->json([
+                'message' => 'Wedding created successfully',
+                'data' => $wedding
+            ], 201);
+        } catch (\Exception $e) {
+            \Log::error('Error creating wedding: ' . $e->getMessage());
+
+            return response()->json([
+                'message' => 'An error occurred while creating the wedding',
+                'error_message' => $e->getMessage()
+            ], 500);
+        }
     }
+
+
 
     public function show($id)
     {
