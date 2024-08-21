@@ -17,12 +17,16 @@ class Wedding extends Model
         'bride_father_name',
         'bride_mother_name',
         'ceremony_time',
+        'ceremony_date',
         'ceremony_location',
         'ceremony_coordinates',
         'reception_time',
+        'reception_date',
         'reception_location',
         'reception_coordinates',
-        'user_id'
+        'user_id',
+        'story',
+        'template'
     ];
     protected $primaryKey = 'wedding_id';
 
