@@ -28,18 +28,20 @@ class WeddingController extends Controller
                 'bride_name' => 'required|string|max:255',
                 'bride_father_name' => 'required|string|max:255',
                 'bride_mother_name' => 'required|string|max:255',
-                'ceremony_time' => 'required|date',
+                'ceremony_time' => 'required',
+                'ceremony_date' => 'required',
                 'ceremony_location' => 'required|string|max:255',
-                'ceremony_coordinates.latitude' => 'required|numeric',
-                'ceremony_coordinates.longitude' => 'required|numeric',
-                'reception_time' => 'required|date',
+                'ceremony_coordinates' => 'required',
+                'reception_time' => 'required',
+                'reception_date' => 'required',
                 'reception_location' => 'required|string|max:255',
-                'reception_coordinates.latitude' => 'required|numeric',
-                'reception_coordinates.longitude' => 'required|numeric',
+                'reception_coordinates' => 'required',
+                'story' => 'required',
+                'template' => 'required',
             ]);
 
-            $validated['ceremony_coordinates'] = json_encode($request->input('ceremony_coordinates'));
-            $validated['reception_coordinates'] = json_encode($request->input('reception_coordinates'));
+            $validated['ceremony_coordinates'] = $request->input('ceremony_coordinates');
+            $validated['reception_coordinates'] = $request->input('reception_coordinates');
 
             $wedding = Auth::user()->weddings()->create($validated);
 

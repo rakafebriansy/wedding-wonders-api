@@ -19,12 +19,16 @@ return new class extends Migration
             $table->string('bride_name');
             $table->string('bride_father_name');
             $table->string('bride_mother_name');
-            $table->dateTime('ceremony_time');
+            $table->string('ceremony_time');
+            $table->string('ceremony_date');
             $table->string('ceremony_location');
             $table->json('ceremony_coordinates'); 
-            $table->dateTime('reception_time');
+            $table->string('reception_time');
+            $table->string('reception_date');
             $table->string('reception_location');
             $table->json('reception_coordinates'); 
+            $table->string('template'); 
+            $table->string('story');
             $table->unsignedBigInteger('user_id'); 
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->timestamps();
